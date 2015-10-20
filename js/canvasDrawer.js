@@ -17,12 +17,12 @@ CanvasDrawer.prototype.drawField = function (modelArr) {
 
         for (var j = 0; j < height; j++) {
             for (var i = 0; i < width; i++) {
-            if (canvasArr[i][j][0] == 1) {
+            if (canvasArr[i][j][0] == 1) {  //draw leftBorder
                 ctx.moveTo(i*cellSize + offset, j*cellSize + offset);
                 ctx.lineTo(i*cellSize + offset, j*cellSize + cellSize + offset);
                 //ctx.stroke();
             }
-            if (canvasArr[i][j][1] == 1) {
+            if (canvasArr[i][j][1] == 1) {  // draw topBorder
                 ctx.moveTo(i*cellSize + offset, j*cellSize + offset);
                 ctx.lineTo(i*cellSize + cellSize + offset, j*cellSize + offset);
                 //ctx.stroke();
@@ -30,6 +30,5 @@ CanvasDrawer.prototype.drawField = function (modelArr) {
         }
     }
     ctx.stroke();
-
 };
 
