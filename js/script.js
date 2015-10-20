@@ -47,13 +47,14 @@ Maze.prototype.createPrimaModel = function (w, h) {
     console.log(x, ' ', y);
 /* ----------------------- end initialize ----------------- */
     var hasBorder = this.hasAttrBorder(this.modelArr);
-    console.log(hasBorder);
-    while (hasBorder) {
+   // console.log(hasBorder);
+    while (hasBorder.length > 0) {
         var numberOfHasAttrBorderLocation = hasBorder.length;
         var randLocation = Math.floor(Math.random()*numberOfHasAttrBorderLocation);
+        //console.log(hasBorder[randLocation]);
         var currentX = hasBorder[randLocation].x;
         var currentY = hasBorder[randLocation].y;
-        this.modelArr[currentX][currentY][2] == 3; // inside attribute
+        this.modelArr[currentX][currentY][2] = 3; // inside attribute
         this.changeAttributeFromOutsideToBorder(currentX,currentY);
 
         var hasInside = this.hasAttrInside(this.modelArr);
@@ -64,6 +65,7 @@ Maze.prototype.createPrimaModel = function (w, h) {
 
         this.breakWall(currentX, currentY, x, y );
         hasBorder = this.hasAttrBorder(this.modelArr);
+        console.log(hasBorder.length);
     }
 };
 
