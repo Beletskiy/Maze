@@ -12,20 +12,21 @@ CanvasDrawer.prototype.drawField = function (modelArr) {
         height = canvasArr[0].length,
         offset = 0.5;
 
+    this.canvasField.width = this.cellSize*width + offset*2;
+    this.canvasField.height = this.cellSize*height + offset*2;
+
     ctx.strokeStyle = 'black';
-    ctx.strokeRect(offset, offset, width*cellSize, height*cellSize );
+    ctx.strokeRect(offset, offset, width*cellSize , height*cellSize );
 
         for (var j = 0; j < height; j++) {
             for (var i = 0; i < width; i++) {
-            if (canvasArr[i][j][0] == 1) {  //draw leftBorder
+            if (canvasArr[i][j][0] == 1) {  //draw leftWall
                 ctx.moveTo(i*cellSize + offset, j*cellSize + offset);
                 ctx.lineTo(i*cellSize + offset, j*cellSize + cellSize + offset);
-                //ctx.stroke();
             }
-            if (canvasArr[i][j][1] == 1) {  // draw topBorder
+            if (canvasArr[i][j][1] == 1) {  // draw topWall
                 ctx.moveTo(i*cellSize + offset, j*cellSize + offset);
                 ctx.lineTo(i*cellSize + cellSize + offset, j*cellSize + offset);
-                //ctx.stroke();
             }
         }
     }

@@ -9,7 +9,7 @@ h2 {
 }
 
 #gameField, #canvasGameField {
-   /* height: 400px; */
+    /*height: 400px;  */
     width: 400px;
     margin: 0 auto;
 }
