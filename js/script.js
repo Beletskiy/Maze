@@ -25,17 +25,17 @@ function Maze () {
 }
 
 Maze.prototype.createRandomModel = function(w,h) {
-    var leftBorder,
-        topBorder;
+    var leftWall,
+        topWall;
     this.modelArr = [];
     this.width = w;
     this.height = h;
     for (var i = 0; i < this.width; i++) {
         var t = [];
         for (var j = 0; j < this.height; j++){
-            leftBorder = Math.round(Math.random());
-            topBorder = Math.round(Math.random());
-            t.push([leftBorder, topBorder]);
+            leftWall = Math.round(Math.random());
+            topWall = Math.round(Math.random());
+            t.push([leftWall, topWall]);
         }
         this.modelArr.push(t);
     }
@@ -64,23 +64,23 @@ Maze.prototype.createPrimaModel = function (w, h) {
     this.changeAttributeFromOutsideToBorder(x,y);
     console.log(x, ' ', y);
 /* ----------------------- end initialize ----------------- */
-    var hasBorder = this.hasAttrBorder(this.modelArr);
-    while (hasBorder.length > 0) {
-        var numberOfHasAttrBorderLocation = hasBorder.length;
+    var hasBorderArr = this.hasAttrBorder(this.modelArr);
+    while (hasBorderArr.length > 0) {
+        var numberOfHasAttrBorderLocation = hasBorderArr.length;
         var randLocation = Math.floor(Math.random()*numberOfHasAttrBorderLocation);
-        var currentX = hasBorder[randLocation].x;
-        var currentY = hasBorder[randLocation].y;
+        var currentX = hasBorderArr[randLocation].x;
+        var currentY = hasBorderArr[randLocation].y;
         this.modelArr[currentX][currentY][2] = 3; // inside attribute
         this.changeAttributeFromOutsideToBorder(currentX,currentY);
 
-        var hasInside = this.hasAttrInside(this.modelArr, currentX, currentY);
-        var numberOfHasAttrInsideLocation = hasInside.length;
+        var hasInsideArr = this.hasAttrInside(this.modelArr, currentX, currentY);
+        var numberOfHasAttrInsideLocation = hasInsideArr.length;
         randLocation = Math.floor(Math.random()*numberOfHasAttrInsideLocation);
-        x = hasInside[randLocation].x;
-        y = hasInside[randLocation].y;
+        x = hasInsideArr[randLocation].x;
+        y = hasInsideArr[randLocation].y;
 
         this.breakWall(currentX, currentY, x, y );
-        hasBorder = this.hasAttrBorder(this.modelArr);
+        hasBorderArr = this.hasAttrBorder(this.modelArr);
     }
 };
 
@@ -110,20 +110,16 @@ Maze.prototype.hasAttrBorder = function (modelArr){
     return hasAttrBorderArr;
 };
 
-Maze.prototype.breakWall = function (currentX, currentY, x, y) { //  оптимизировать
-    // разбить левую стену у того location ,  где х больше
-    // разбить верхнюю стену у того location , где y больше
-    if (currentX > x) {
-        this.modelArr[currentX][currentY][0] = 0;
+Maze.prototype.breakWall = function (currentX, currentY, x, y) {
+    // break leftWall, from location, where position x bigger
+    // break topWall, from location, where position y bigger
+
+    if (currentX !== x) {
+        (currentX > x) ? this.modelArr[currentX][currentY][0] = 0 : this.modelArr[x][y][0] = 0;
         return false;
-    } else if (x > currentX) {
-        this.modelArr[x][y][0] = 0;
-        return false;
-    } else if (currentY > y) {
-        this.modelArr[currentX][currentY][1] = 0;
-        return false;
-    } else if (y > currentY) {
-        this.modelArr[x][y][1] = 0;
+    }
+    if (currentY !== y) {
+        (currentY > y) ? this.modelArr[currentX][currentY][1] = 0 : this.modelArr[x][y][1] = 0;
         return false;
     }
 };
