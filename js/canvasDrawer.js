@@ -1,6 +1,6 @@
 
 function CanvasDrawer () {
-    this.cellSize = 20;
+    this.cellSize = 30;
     this.canvasField = document.getElementById("canvasGameField");
     this.ctx = this.canvasField.getContext('2d');
 }
@@ -16,6 +16,7 @@ CanvasDrawer.prototype.drawField = function (modelArr) {
     this.canvasField.height = this.cellSize*height + offset*2;
 
     ctx.strokeStyle = 'black';
+    ctx.lineWidth = 4;
     ctx.strokeRect(offset, offset, width*cellSize , height*cellSize );
 
         for (var j = 0; j < height; j++) {

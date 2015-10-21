@@ -22,7 +22,14 @@ function Maze () {
             y : 0
         }
     ];
+    this.neighborsLength = this.neighbors.length;
 }
+
+Maze.prototype.types = {
+    OUTSIDE : 2,
+    INSIDE : 3,
+    BORDER : 4
+};
 
 Maze.prototype.createRandomModel = function(w,h) {
     var leftWall,
@@ -45,7 +52,14 @@ Maze.prototype.createPrimaModel = function (w, h) {
     /* -----------------------initialize------------------ */
     var leftWall = 1,
         topWall = 1,
-        cellAttribute = 2; // outside attribute
+        hasBorderArr,
+        numberOfHasAttrBorderLocations,
+        hasInsideArr,
+        numberOfHasAttrInsideLocations,
+        randLocation,
+        currentX,
+        currentY,
+        cellAttribute = this.types.OUTSIDE;
     this.modelArr = [];
     this.width = w;
     this.height = h;
@@ -60,59 +74,93 @@ Maze.prototype.createPrimaModel = function (w, h) {
     var x = Math.floor(Math.random()*this.width),
         y = Math.floor(Math.random()*this.height);
 
-    this.modelArr[x][y][2] = 3; //inside attribute
+    this.modelArr[x][y][2] = this.types.INSIDE;
     this.changeAttributeFromOutsideToBorder(x,y);
-    console.log(x, ' ', y);
 /* ----------------------- end initialize ----------------- */
-    var hasBorderArr = this.hasAttrBorder(this.modelArr);
+    hasBorderArr = this.hasAttrBorder(this.modelArr);
     while (hasBorderArr.length > 0) {
-        var numberOfHasAttrBorderLocation = hasBorderArr.length;
-        var randLocation = Math.floor(Math.random()*numberOfHasAttrBorderLocation);
-        var currentX = hasBorderArr[randLocation].x;
-        var currentY = hasBorderArr[randLocation].y;
-        this.modelArr[currentX][currentY][2] = 3; // inside attribute
-        this.changeAttributeFromOutsideToBorder(currentX,currentY);
 
-        var hasInsideArr = this.hasAttrInside(this.modelArr, currentX, currentY);
-        var numberOfHasAttrInsideLocation = hasInsideArr.length;
-        randLocation = Math.floor(Math.random()*numberOfHasAttrInsideLocation);
+        numberOfHasAttrBorderLocations = hasBorderArr.length;
+        randLocation = this.chooseRandLocation(numberOfHasAttrBorderLocations);
+        currentX = hasBorderArr[randLocation].x;
+        currentY = hasBorderArr[randLocation].y;
+       // currentX = this.calculateRandCoordinates(hasBorderArr, 'x');
+       // currentY = this.calculateRandCoordinates(hasBorderArr, 'y');
+
+        this.modelArr[currentX][currentY][2] = this.types.INSIDE; // inside attribute
+        this.changeAttributeFromOutsideToBorder(currentX,currentY);
+        hasInsideArr = this.hasAttrInside(this.modelArr, currentX, currentY);
+
+        numberOfHasAttrInsideLocations = hasInsideArr.length;
+        randLocation = this.chooseRandLocation(numberOfHasAttrInsideLocations);
         x = hasInsideArr[randLocation].x;
         y = hasInsideArr[randLocation].y;
-
-        this.breakWall(currentX, currentY, x, y );
+        //   x = this.calculateRandCoordinates(hasInsideArr, 'x');
+        //   y = this.calculateRandCoordinates(hasInsideArr, 'y');
+        this.breakWall(currentX, currentY, x, y);
         hasBorderArr = this.hasAttrBorder(this.modelArr);
     }
 };
-
+/*Maze.prototype.calculateRandCoordinates = function (Arr, axis) {
+    var numberOfLocations = Arr.length;
+    var randLocation = this.chooseRandLocation(numberOfLocations);
+    var randCoordinate = Arr[randLocation][axis];
+    return randCoordinate;
+}; */
+Maze.prototype.chooseRandLocation = function (numberOfLocations) {
+    return Math.floor(Math.random()*numberOfLocations);
+};
 Maze.prototype.hasAttrInside = function (modelArr, currentX, currentY) { //find all neighbors , what have attribute inside(3)
+
     var hasAttrInsideArr = [];
 
-    for (var i = 0; i < this.neighbors.length; i++) {
-        var obj = this.neighbors[i];
-        if ( (currentY + obj.y) < this.height && (currentX + obj.x) < this.width && (currentY + obj.y > -1)
-            && (currentX + obj.x > -1)
-            && (this.modelArr[currentX + obj.x][currentY + obj.y][2] == 3)) {
-            hasAttrInsideArr.push({x:currentX + obj.x, y:currentY + obj.y});
+    for (var i = 0; i < this.neighborsLength; i++) {
+        var obj = this.neighbors[i],
+            offsetY = currentY + obj.y,
+            offsetX = currentX + obj.x,
+            yInBorders = (offsetY < this.height) && (offsetY > -1),
+            xInBorders = (offsetX < this.width) && (offsetX > -1),
+            isCellTypeInside;
+        // todo namings & additional variables -----------------------ready-----------------------------------
+
+        if (yInBorders && xInBorders) {
+            isCellTypeInside = (this.modelArr[offsetX][offsetY][2] == this.types.INSIDE);
+            if (isCellTypeInside) {
+                hasAttrInsideArr.push({x : offsetX, y : offsetY});
+            }
         }
     }
     return hasAttrInsideArr;
 };
 
 Maze.prototype.hasAttrBorder = function (modelArr){
+
+    // todo optimize calls amount
+
     var hasAttrBorderArr = [];
-        for (var i = 0; i < this.height; i++) {
-            for (var j = 0; j < this.width; j++) {
-                if (modelArr[j][i][2] == 4) {
-                    hasAttrBorderArr.push({x:j,y:i});
-                }
+    for (var i = 0; i < this.height; i++) {
+        for (var j = 0; j < this.width; j++) {
+            if (modelArr[j][i][2] == this.types.BORDER) {
+                hasAttrBorderArr.push({x:j,y:i});
             }
         }
+    }
     return hasAttrBorderArr;
 };
 
 Maze.prototype.breakWall = function (currentX, currentY, x, y) {
     // break leftWall, from location, where position x bigger
     // break topWall, from location, where position y bigger
+    // todo do not run code in (a ? b : c)
+
+    //var newX = Math.max(x, currentX),
+    //    newY = Math.max(y, currentY),
+    //    dx = Math.abs(x - currentX),
+    //    dy = Math.abs(y - currentY);
+    //
+    //this.modelArr[newX][newY][0] *= 1 - dx;
+    //this.modelArr[newX][newY][1] *= 1 - dy;
+
 
     if (currentX !== x) {
         (currentX > x) ? this.modelArr[currentX][currentY][0] = 0 : this.modelArr[x][y][0] = 0;
@@ -126,17 +174,27 @@ Maze.prototype.breakWall = function (currentX, currentY, x, y) {
 
 Maze.prototype.changeAttributeFromOutsideToBorder = function (x,y) {
 
-    for (var i = 0; i < this.neighbors.length; i++) {
-        var obj = this.neighbors[i];
-        if ( (y + obj.y) < this.height && (x + obj.x) < this.width && (y + obj.y > -1) && (x + obj.x > -1)
-            && (this.modelArr[x + obj.x][y + obj.y][2] == 2)) {
-            this.modelArr[x + obj.x][y + obj.y][2] = 4; // border attribute
+    for (var i = 0; i < this.neighborsLength; i++) {
+        var obj = this.neighbors[i],
+            offsetX = x + obj.x,
+            offsetY = y + obj.y,
+            yInBorders = (offsetY < this.height) && (offsetY > -1),
+            xInBorders = (offsetX < this.width) && (offsetX > -1),
+            isOffsetCellOutsideType;
+        if (xInBorders && yInBorders) {
+            isOffsetCellOutsideType = (this.modelArr[offsetX][offsetY][2] == this.types.OUTSIDE);
+            if (isOffsetCellOutsideType) {
+                this.modelArr[offsetX][offsetY][2] = this.types.BORDER; // border attribute
+            }
         }
     }
 };
 
 var maze = new Maze();
 //maze.createRandomModel(5, 5);
+
+console.time('test');
 maze.createPrimaModel(10, 10);
+console.timeEnd('test');
+
 maze.drawer.drawField(maze.modelArr);
-//console.log(maze);
