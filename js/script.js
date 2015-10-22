@@ -25,6 +25,7 @@ function Maze () {
     this.neighborsLength = this.neighbors.length;
     this.numberOfCurrentIteration = 1;
     this.currentPositionArr = [];
+    this.slip = 0;
 }
 
 Maze.prototype.types = {
@@ -202,9 +203,10 @@ Maze.prototype.findWay = function (currentPositionArr, finishX, finishY) {
     var currentPositionArrLength = currentPositionArr.length,
         finishLocation = {x: finishX, y: finishY};
 
-    for (var j = 0; j < currentPositionArrLength; j++) {
+    for (var j = this.slip; j < currentPositionArrLength; j++) {
         var x = currentPositionArr[j].x,
             y = currentPositionArr[j].y;
+
         for (var i = 0; i < this.neighborsLength; i++) {
             var obj = this.neighbors[i],
                 offsetX = x + obj.x,
@@ -228,6 +230,7 @@ Maze.prototype.findWay = function (currentPositionArr, finishX, finishY) {
                 }
             }
         }
+        this.slip++;
     }
     this.numberOfCurrentIteration++;
     this.findWay(currentPositionArr, finishX, finishY);
