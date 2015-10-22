@@ -23,12 +23,15 @@ function Maze () {
         }
     ];
     this.neighborsLength = this.neighbors.length;
+    this.numberOfIteration = 1;
+    this.currentPositionArr = [];
 }
 
 Maze.prototype.types = {
     OUTSIDE : 2,
-    INSIDE : 3,
-    BORDER : 4
+    INSIDE : 0,
+    BORDER : 4,
+    START_LOCATION : {x:0, y:0}
 };
 
 Maze.prototype.createRandomModel = function(w,h) {
@@ -184,10 +187,99 @@ Maze.prototype.changeAttributeFromOutsideToBorder = function (x,y) {
         if (xInBorders && yInBorders) {
             isOffsetCellOutsideType = (this.modelArr[offsetX][offsetY][2] == this.types.OUTSIDE);
             if (isOffsetCellOutsideType) {
-                this.modelArr[offsetX][offsetY][2] = this.types.BORDER; // border attribute
+                this.modelArr[offsetX][offsetY][2] = this.types.BORDER;
             }
         }
     }
+};
+Maze.prototype.startSolvingMaze = function () {
+    this.modelArr[this.types.START_LOCATION.x][this.types.START_LOCATION.y][2] = this.numberOfIteration;
+    var x = this.types.START_LOCATION.x,
+        y = this.types.START_LOCATION.y;
+    this.currentPositionArr.push({x : x, y : y});
+    this.findWay(this.currentPositionArr);
+};
+
+Maze.prototype.findWay = function (currentPositionArr) {
+
+    var currentPositionArrLength = currentPositionArr.length,
+        finishLocation = {x: this.width -1, y: this.height - 1};
+
+    for (var j = 0; j < currentPositionArrLength; j++) {
+        var x = currentPositionArr[j].x,
+            y = currentPositionArr[j].y;
+        for (var i = 0; i < this.neighborsLength; i++) {
+            var obj = this.neighbors[i],
+                offsetX = x + obj.x,
+                offsetY = y + obj.y,
+                yInBorders = (offsetY < this.height) && (offsetY > -1),
+                xInBorders = (offsetX < this.width) && (offsetX > -1),
+                isOffsetCellInsideType;
+            if (xInBorders && yInBorders) {
+                isOffsetCellInsideType = (this.modelArr[offsetX][offsetY][2] == this.types.INSIDE);
+                if ((isOffsetCellInsideType) && (!this.isWallBetweenLocations(x, y, offsetX, offsetY))) {
+                    this.modelArr[offsetX][offsetY][2] = this.numberOfIteration + 1;
+                    if ((offsetX == finishLocation.x) && (offsetY == finishLocation.y)) {
+                        console.log("Find a way!");
+                        //console.log(this.modelArr);
+                        this.calculateWayOut(this.modelArr, finishLocation);
+                        return false;
+                    }
+                    currentPositionArr.push({x: offsetX, y: offsetY});
+                }
+            }
+        }
+    }
+    this.numberOfIteration++;
+    this.findWay(currentPositionArr);
+};
+Maze.prototype.isWallBetweenLocations = function (x, y, offsetX, offsetY) {
+    if (offsetX !== x) {
+        if ((offsetX > x) && (this.modelArr[offsetX][offsetY][0] == 1)) {
+            return true;
+        }   else if ((offsetX < x) && (this.modelArr[x][y][0] == 1)) {
+            return true;
+        }
+        return false;
+    }
+    if (offsetY !== y) {
+        if ((offsetY > y) && (this.modelArr[offsetX][offsetY][1] == 1)) {
+            return true;
+        }   else if ((offsetY < y) && (this.modelArr[x][y][1] == 1)) {
+            return true;
+        }
+        return false;
+    }
+};
+Maze.prototype.calculateWayOut = function (modelArr, finishLocation) {
+    var wayOutArr = [],
+        currentX = finishLocation.x,
+        currentY = finishLocation.y,
+        lastNumber = this.modelArr[currentX][currentY][2],
+        currentLastNumber = lastNumber;
+    wayOutArr.push({x: currentX, y: currentY});
+
+    while (wayOutArr.length < lastNumber) {
+        for (var i = 0; i < this.neighborsLength; i++) {
+            var obj = this.neighbors[i],
+                offsetX = currentX + obj.x,
+                offsetY = currentY + obj.y,
+                yInBorders = (offsetY < this.height) && (offsetY > -1),
+                xInBorders = (offsetX < this.width) && (offsetX > -1);
+
+            if (xInBorders && yInBorders ) {
+                var isRightPenultNumber = (this.modelArr[offsetX][offsetY][2] == currentLastNumber - 1);
+                if (!this.isWallBetweenLocations(currentX, currentY, offsetX, offsetY) && isRightPenultNumber) {
+                    wayOutArr.push({x: offsetX, y: offsetY});
+                    //console.log(wayOutArr);
+                    currentLastNumber--;
+                    currentX = offsetX;
+                    currentY = offsetY;
+                }
+            }
+        }
+    }
+    this.drawer.drawWayOut(wayOutArr);
 };
 
 var maze = new Maze();
@@ -196,5 +288,7 @@ var maze = new Maze();
 console.time('test');
 maze.createPrimaModel(10, 10);
 console.timeEnd('test');
-
 maze.drawer.drawField(maze.modelArr);
+console.time('findWay');
+maze.startSolvingMaze();
+console.timeEnd('findWay');

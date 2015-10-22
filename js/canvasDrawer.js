@@ -1,6 +1,6 @@
 
 function CanvasDrawer () {
-    this.cellSize = 30;
+    this.cellSize = 20;
     this.canvasField = document.getElementById("canvasGameField");
     this.ctx = this.canvasField.getContext('2d');
 }
@@ -30,6 +30,21 @@ CanvasDrawer.prototype.drawField = function (modelArr) {
                 ctx.lineTo(i*cellSize + cellSize + offset, j*cellSize + offset);
             }
         }
+    }
+    ctx.stroke();
+};
+CanvasDrawer.prototype.drawWayOut = function (wayOutArr) {
+    var wayOutArrLength = wayOutArr.length,
+        //width = canvasArr.length,
+        //height = canvasArr[0].length,
+        cellSize = this.cellSize,
+        ctx = this.ctx;
+    ctx.strokeStyle = 'green';
+    ctx.lineWidth = 2;
+
+    for (var i = 0; i < wayOutArrLength -1; i++) {
+        ctx.moveTo(wayOutArr[i].x*cellSize + cellSize/2, wayOutArr[i].y*cellSize + cellSize/2);
+        ctx.lineTo(wayOutArr[i + 1].x*cellSize + cellSize/2, wayOutArr[i + 1].y*cellSize + cellSize/2);
     }
     ctx.stroke();
 };
