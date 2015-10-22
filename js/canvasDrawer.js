@@ -18,8 +18,8 @@ CanvasDrawer.prototype.drawField = function (modelArr) {
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 4;
     ctx.strokeRect(offset, offset, width*cellSize , height*cellSize );
-
-        for (var j = 0; j < height; j++) {
+    ctx.beginPath();
+    for (var j = 0; j < height; j++) {
             for (var i = 0; i < width; i++) {
             if (canvasArr[i][j][0] == 1) {  //draw leftWall
                 ctx.moveTo(i*cellSize + offset, j*cellSize + offset);
@@ -35,14 +35,12 @@ CanvasDrawer.prototype.drawField = function (modelArr) {
 };
 CanvasDrawer.prototype.drawWayOut = function (wayOutArr) {
     var wayOutArrLength = wayOutArr.length,
-        //width = canvasArr.length,
-        //height = canvasArr[0].length,
         cellSize = this.cellSize,
         ctx = this.ctx;
+    ctx.beginPath();
     ctx.strokeStyle = 'green';
     ctx.lineWidth = 2;
-
-    for (var i = 0; i < wayOutArrLength -1; i++) {
+    for (var i = 0; i < wayOutArrLength - 1; i++) {
         ctx.moveTo(wayOutArr[i].x*cellSize + cellSize/2, wayOutArr[i].y*cellSize + cellSize/2);
         ctx.lineTo(wayOutArr[i + 1].x*cellSize + cellSize/2, wayOutArr[i + 1].y*cellSize + cellSize/2);
     }
