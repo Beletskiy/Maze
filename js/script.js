@@ -209,7 +209,7 @@ Maze.prototype.findWayOut = function (currentPositionArr, finishX, finishY) {
 
                     if ((offsetX == finishLocation.x) && (offsetY == finishLocation.y)) {
                         console.log("Find a way!");
-                        this.calculateWayOutArr(this.modelArr, finishLocation);
+                        this.calculateWayOutArr(finishLocation);
                         return false;
                     }
                     currentPositionArr.push({x: offsetX, y: offsetY});
@@ -239,7 +239,7 @@ Maze.prototype.isWallBetweenLocations = function (x, y, offsetX, offsetY) {
         return false;
     }
 };
-Maze.prototype.calculateWayOutArr = function (modelArr, finishLocation) {
+Maze.prototype.calculateWayOutArr = function (finishLocation) {
     var wayOutArr = [],
         currentX = finishLocation.x,
         currentY = finishLocation.y,
@@ -273,9 +273,9 @@ var maze = new Maze();
 //maze.createRandomModel(5, 5);
 
 console.time('test');
-maze.createPrimaModel(10, 10);
+maze.createPrimaModel(100, 100);
 console.timeEnd('test');
 maze.drawer.drawField(maze.modelArr);
 console.time('findWayOut');
-maze.startSolvingMaze(0,0,9,9);
+maze.startSolvingMaze(0,0,99,99);
 console.timeEnd('findWayOut');
