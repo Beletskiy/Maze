@@ -228,7 +228,6 @@ Maze.prototype.isWallBetweenLocations = function (x, y, offsetX, offsetY) {
         }   else if ((offsetX < x) && (this.modelArr[x][y][0] == 1)) {
             return true;
         }
-        return false;
     }
     if (offsetY !== y) {
         if ((offsetY > y) && (this.modelArr[offsetX][offsetY][1] == 1)) {
@@ -236,7 +235,6 @@ Maze.prototype.isWallBetweenLocations = function (x, y, offsetX, offsetY) {
         }   else if ((offsetY < y) && (this.modelArr[x][y][1] == 1)) {
             return true;
         }
-        return false;
     }
 };
 Maze.prototype.calculateWayOutArr = function (finishLocation) {
@@ -277,5 +275,5 @@ maze.createPrimaModel(100, 100);
 console.timeEnd('test');
 maze.drawer.drawField(maze.modelArr);
 console.time('findWayOut');
-maze.startSolvingMaze(0,0,99,99);
+maze.startSolvingMaze(0, 0, 99, 99);
 console.timeEnd('findWayOut');
