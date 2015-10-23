@@ -86,29 +86,19 @@ Maze.prototype.createPrimaModel = function (w, h) {
         randLocation = this.chooseRandLocation(numberOfHasAttrBorderLocations);
         currentX = this.hasAttrBorderArr[randLocation].x;
         currentY = this.hasAttrBorderArr[randLocation].y;
-       // currentX = this.calculateRandCoordinates(hasBorderArr, 'x');
-       // currentY = this.calculateRandCoordinates(hasBorderArr, 'y');
-
         this.modelArr[currentX][currentY][2] = this.types.INSIDE;
         this.deleteElemFromHasAttrBorderArr(currentX, currentY);
         this.changeAttributeFromOutsideToBorder(currentX,currentY);
-        hasInsideArr = this.hasAttrInside(this.modelArr, currentX, currentY);
 
+        hasInsideArr = this.hasAttrInside(this.modelArr, currentX, currentY);
         numberOfHasAttrInsideLocations = hasInsideArr.length;
         randLocation = this.chooseRandLocation(numberOfHasAttrInsideLocations);
         x = hasInsideArr[randLocation].x;
         y = hasInsideArr[randLocation].y;
-        //   x = this.calculateRandCoordinates(hasInsideArr, 'x');
-        //   y = this.calculateRandCoordinates(hasInsideArr, 'y');
         this.breakWall(currentX, currentY, x, y);
     }
 };
-/*Maze.prototype.calculateRandCoordinates = function (Arr, axis) {
-    var numberOfLocations = Arr.length;
-    var randLocation = this.chooseRandLocation(numberOfLocations);
-    var randCoordinate = Arr[randLocation][axis];
-    return randCoordinate;
-}; */
+
 Maze.prototype.deleteElemFromHasAttrBorderArr= function (currentX, currentY) {
     var hasAttrBorderArrLength = this.hasAttrBorderArr.length;
     for (var i = 0; i < hasAttrBorderArrLength; i++) {
@@ -118,9 +108,11 @@ Maze.prototype.deleteElemFromHasAttrBorderArr= function (currentX, currentY) {
         }
     }
 };
+
 Maze.prototype.chooseRandLocation = function (numberOfLocations) {
     return Math.floor(Math.random()*numberOfLocations);
 };
+
 Maze.prototype.hasAttrInside = function (modelArr, currentX, currentY) { //find all neighbors , what have attribute inside(3)
 
     var hasAttrInsideArr = [];
