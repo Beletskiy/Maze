@@ -2,6 +2,7 @@ function Maze () {
 
     this.drawer = new CanvasDrawer();
     this.modelArr = null;
+    this.hasAttrBorderArr = [];
     this.width = 0;
     this.height = 0;
     this.neighbors = [
@@ -32,7 +33,6 @@ Maze.prototype.types = {
     OUTSIDE : 2,
     INSIDE : 0,
     BORDER : 4
-   // START_LOCATION : {x:0, y:0}
 };
 
 Maze.prototype.createRandomModel = function(w,h) {
@@ -56,7 +56,6 @@ Maze.prototype.createPrimaModel = function (w, h) {
     /* -----------------------initialize------------------ */
     var leftWall = 1,
         topWall = 1,
-        hasBorderArr,
         numberOfHasAttrBorderLocations,
         hasInsideArr,
         numberOfHasAttrInsideLocations,
@@ -81,17 +80,17 @@ Maze.prototype.createPrimaModel = function (w, h) {
     this.modelArr[x][y][2] = this.types.INSIDE;
     this.changeAttributeFromOutsideToBorder(x,y);
 /* ----------------------- end initialize ----------------- */
-    hasBorderArr = this.hasAttrBorder(this.modelArr);
-    while (hasBorderArr.length > 0) {
+    while (this.hasAttrBorderArr.length > 0) {
 
-        numberOfHasAttrBorderLocations = hasBorderArr.length;
+        numberOfHasAttrBorderLocations = this.hasAttrBorderArr.length;
         randLocation = this.chooseRandLocation(numberOfHasAttrBorderLocations);
-        currentX = hasBorderArr[randLocation].x;
-        currentY = hasBorderArr[randLocation].y;
+        currentX = this.hasAttrBorderArr[randLocation].x;
+        currentY = this.hasAttrBorderArr[randLocation].y;
        // currentX = this.calculateRandCoordinates(hasBorderArr, 'x');
        // currentY = this.calculateRandCoordinates(hasBorderArr, 'y');
 
-        this.modelArr[currentX][currentY][2] = this.types.INSIDE; // inside attribute
+        this.modelArr[currentX][currentY][2] = this.types.INSIDE;
+        this.deleteElemFromHasAttrBorderArr(currentX, currentY);
         this.changeAttributeFromOutsideToBorder(currentX,currentY);
         hasInsideArr = this.hasAttrInside(this.modelArr, currentX, currentY);
 
@@ -102,7 +101,6 @@ Maze.prototype.createPrimaModel = function (w, h) {
         //   x = this.calculateRandCoordinates(hasInsideArr, 'x');
         //   y = this.calculateRandCoordinates(hasInsideArr, 'y');
         this.breakWall(currentX, currentY, x, y);
-        hasBorderArr = this.hasAttrBorder(this.modelArr);
     }
 };
 /*Maze.prototype.calculateRandCoordinates = function (Arr, axis) {
@@ -111,6 +109,15 @@ Maze.prototype.createPrimaModel = function (w, h) {
     var randCoordinate = Arr[randLocation][axis];
     return randCoordinate;
 }; */
+Maze.prototype.deleteElemFromHasAttrBorderArr= function (currentX, currentY) {
+    var hasAttrBorderArrLength = this.hasAttrBorderArr.length;
+    for (var i = 0; i < hasAttrBorderArrLength; i++) {
+        if (this.hasAttrBorderArr[i].x == currentX && this.hasAttrBorderArr[i].y == currentY ) {
+            this.hasAttrBorderArr.splice(i, 1);
+            return false;
+        }
+    }
+};
 Maze.prototype.chooseRandLocation = function (numberOfLocations) {
     return Math.floor(Math.random()*numberOfLocations);
 };
@@ -135,21 +142,6 @@ Maze.prototype.hasAttrInside = function (modelArr, currentX, currentY) { //find 
         }
     }
     return hasAttrInsideArr;
-};
-
-Maze.prototype.hasAttrBorder = function (modelArr){
-
-    // todo optimize calls amount
-
-    var hasAttrBorderArr = [];
-    for (var i = 0; i < this.height; i++) {
-        for (var j = 0; j < this.width; j++) {
-            if (modelArr[j][i][2] == this.types.BORDER) {
-                hasAttrBorderArr.push({x:j,y:i});
-            }
-        }
-    }
-    return hasAttrBorderArr;
 };
 
 Maze.prototype.breakWall = function (currentX, currentY, x, y) {
@@ -189,17 +181,19 @@ Maze.prototype.changeAttributeFromOutsideToBorder = function (x,y) {
             isOffsetCellOutsideType = (this.modelArr[offsetX][offsetY][2] == this.types.OUTSIDE);
             if (isOffsetCellOutsideType) {
                 this.modelArr[offsetX][offsetY][2] = this.types.BORDER;
+                this.hasAttrBorderArr.push(({x: offsetX, y: offsetY}));
             }
         }
     }
 };
+/* -------------------------------------Solving Maze ------------------------------------------------*/
 Maze.prototype.startSolvingMaze = function (startX, startY, finishX, finishY) {
     this.modelArr[startX][startY][2] = this.numberOfCurrentIteration;
     this.currentPositionArr.push({x : startX, y : startY});
-    this.findWay(this.currentPositionArr, finishX, finishY);
+    this.findWayOut(this.currentPositionArr, finishX, finishY);
 };
 
-Maze.prototype.findWay = function (currentPositionArr, finishX, finishY) {
+Maze.prototype.findWayOut = function (currentPositionArr, finishX, finishY) {
     var currentPositionArrLength = currentPositionArr.length,
         finishLocation = {x: finishX, y: finishY};
 
@@ -233,7 +227,7 @@ Maze.prototype.findWay = function (currentPositionArr, finishX, finishY) {
         this.slip++;
     }
     this.numberOfCurrentIteration++;
-    this.findWay(currentPositionArr, finishX, finishY);
+    this.findWayOut(currentPositionArr, finishX, finishY);
 };
 Maze.prototype.isWallBetweenLocations = function (x, y, offsetX, offsetY) {
     if (offsetX !== x) {
@@ -291,6 +285,6 @@ console.time('test');
 maze.createPrimaModel(10, 10);
 console.timeEnd('test');
 maze.drawer.drawField(maze.modelArr);
-console.time('findWay');
+console.time('findWayOut');
 maze.startSolvingMaze(0,0,9,9);
-console.timeEnd('findWay');
+console.timeEnd('findWayOut');
