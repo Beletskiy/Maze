@@ -26,7 +26,7 @@ function Maze () {
     this.neighborsLength = this.neighbors.length;
     this.numberOfCurrentIteration = 1;
     this.currentPositionArr = [];
-    this.slip = 0;
+    this.findWayOutOffset = 0;
 }
 
 Maze.prototype.types = {
@@ -197,7 +197,7 @@ Maze.prototype.findWayOut = function (currentPositionArr, finishX, finishY) {
     var currentPositionArrLength = currentPositionArr.length,
         finishLocation = {x: finishX, y: finishY};
 
-    for (var j = this.slip; j < currentPositionArrLength; j++) {
+    for (var j = this.findWayOutOffset; j < currentPositionArrLength; j++) {
         var x = currentPositionArr[j].x,
             y = currentPositionArr[j].y;
 
@@ -217,14 +217,14 @@ Maze.prototype.findWayOut = function (currentPositionArr, finishX, finishY) {
 
                     if ((offsetX == finishLocation.x) && (offsetY == finishLocation.y)) {
                         console.log("Find a way!");
-                        this.calculateWayOut(this.modelArr, finishLocation);
+                        this.calculateWayOutArr(this.modelArr, finishLocation);
                         return false;
                     }
                     currentPositionArr.push({x: offsetX, y: offsetY});
                 }
             }
         }
-        this.slip++;
+        this.findWayOutOffset++;
     }
     this.numberOfCurrentIteration++;
     this.findWayOut(currentPositionArr, finishX, finishY);
@@ -247,7 +247,7 @@ Maze.prototype.isWallBetweenLocations = function (x, y, offsetX, offsetY) {
         return false;
     }
 };
-Maze.prototype.calculateWayOut = function (modelArr, finishLocation) {
+Maze.prototype.calculateWayOutArr = function (modelArr, finishLocation) {
     var wayOutArr = [],
         currentX = finishLocation.x,
         currentY = finishLocation.y,
@@ -267,7 +267,6 @@ Maze.prototype.calculateWayOut = function (modelArr, finishLocation) {
                 var isRightPenultNumber = (this.modelArr[offsetX][offsetY][2] == currentLastNumber - 1);
                 if (!this.isWallBetweenLocations(currentX, currentY, offsetX, offsetY) && isRightPenultNumber) {
                     wayOutArr.push({x: offsetX, y: offsetY});
-                    //console.log(wayOutArr);
                     currentLastNumber--;
                     currentX = offsetX;
                     currentY = offsetY;
